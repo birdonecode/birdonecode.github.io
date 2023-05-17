@@ -1,0 +1,93 @@
+local player = game.Players.LocalPlayer
+local humanoid = player.Character:WaitForChild("Humanoid")
+local model = game.Workspace.ModelToFollow
+local health = 150
+local followSpeed = 5
+
+local function decreasePlayerHealth()
+    while true do
+        wait(2)
+        humanoid.Health = humanoid.Health - humanoid.MaxHealth * 0.25
+    end
+end
+
+spawn(decreasePlayerHealth)
+
+local function createNeonPath()
+    local mouse = player:GetMouse()
+    local dot = Instance.new("Part")
+    dot.Size = Vector3.new(0.2, 0.2, 0.2)
+    dot.Shape = Enum.PartType.Ball
+    dot.BrickColor = BrickColor.new("Bright yellow")
+    dot.Anchored = true
+    dot.CanCollide = false
+    dot.Parent = game.Workspace
+
+    while true do
+        local clickPos = mouse.Click:Wait()
+        dot.Position = clickPos
+
+        local direction = (dot.Position - model.Position).unit
+        local ray = Ray.new(dot.Position, direction * 1000)
+        local hitPart, hitPos = game.Workspace:FindPartOnRay(ray, model)
+
+        if hitPart and hitPart.Parent == model then
+            health = health - 25
+            if health <= 0 then
+                model:Destroy()
+                player.leaderstats.Points.Value = player.leaderstats.Points.Value + 100
+            end
+        end
+    end
+end
+
+spawn(createNeonPath)
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "InventoryGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player.PlayerGui
+
+local inventoryFrame = Instance.new("Frame")
+inventoryFrame.Name = "InventoryFrame"
+inventoryFrame.Size = UDim2.new(0, 200, 0, 200)
+inventoryFrame.Position = UDim2.new(0.5, -100, 0.5, -100)
+inventoryFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+inventoryFrame.BackgroundTransparency = 0.5
+inventoryFrame.Visible = false
+inventoryFrame.Parent = screenGui
+
+local hideButton = Instance.new("TextButton")
+hideButton.Name = "HideButton"
+hideButton.Size = UDim2.new(0, 20, 0, 20)
+hideButton.Position = UDim2.new(1, -30, 0, 5)
+hideButton.BackgroundTransparency = 1
+hideButton.Text = "X"
+hideButton.TextColor3 = Color3.new(1, 1, 1)
+hideButton.TextSize = 14
+hideButton.Parent = inventoryFrame
+
+hideButton.MouseButton1Click:Connect(function()
+    inventoryFrame.Visible = false
+end)
+
+local showButton = Instance.new("TextButton")
+showButton.Name = "ShowButton"
+showButton.Size = UDim2.new(0, 100, 0, 50)
+showButton.Position = UDim2.new(0.5, -50, 0.5, -25)
+showButton.BackgroundColor3 = Color3.new(0, 0, 1)
+showButton.BackgroundTransparency = 0.5
+showButton.Text = "Inventory"
+showButton.TextColor3 = Color3.new(1, 1, 1)
+showButton.TextSize = 24
+showButton.Parent = player.PlayerGui
+
+showButton.MouseButton1Click:Connect(function()
+    inventoryFrame.Visible = true
+end)
+
+while true do
+    local direction = (player.Character.HumanoidRootPart.Position - model.Position).unit
+    model:SetPrimaryPartCFrame(model:GetPrimaryPartCFrame() + direction * followSpeed)
+    wait()
+end
