@@ -1,0 +1,12 @@
+local monster = workspace:WaitForChild("Monster")
+local player = game.Players.LocalPlayer.Character
+
+local speed = 20
+
+local function moveToPlayer()
+    local direction = (player.HumanoidRootPart.Position - monster.Position).Unit
+    monster:MoveTo(player.HumanoidRootPart.Position)
+    monster.Humanoid:Move(direction * speed)
+end
+
+game:GetService("RunService").Heartbeat:Connect(moveToPlayer)
