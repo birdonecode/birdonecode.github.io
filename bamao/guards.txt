@@ -1,0 +1,102 @@
+local villageComplete = false
+local player = game.Players.LocalPlayer
+local guards = {}  -- An array to store the guards
+
+local function createGuard(position)
+    local guard = Instance.new("Part")
+    guard.Size = Vector3.new(2, 5, 2)
+    guard.Position = position
+    guard.BrickColor = BrickColor.new("Bright blue")
+    guard.Anchored = true
+    guard.CanCollide = false
+    guard.Parent = game.Workspace
+
+    return guard
+end
+
+-- Create the guards
+guards[1] = createGuard(Vector3.new(10, 0, 0))
+guards[2] = createGuard(Vector3.new(5, 0, 0))
+guards[3] = createGuard(Vector3.new(0, 0, 0))
+guards[4] = createGuard(Vector3.new(-5, 0, 0))
+
+local function formLineFormation()
+    for _, guard in ipairs(guards) do
+        guard.Anchored = false
+        guard.CanCollide = true
+        guard.CFrame = CFrame.new(guard.Position + Vector3.new(0, 2.5, 0))
+    end
+end
+
+local function stepAside()
+    for _, guard in ipairs(guards) do
+        guard.Anchored = true
+        guard.CanCollide = false
+        guard.CFrame = CFrame.new(guard.Position)
+    end
+end
+
+local function showMessage(message)
+    local messageGui = Instance.new("BillboardGui")
+    messageGui.Name = "MessageGui"
+    messageGui.Adornee = guards[1]
+    messageGui.Size = UDim2.new(0, 200, 0, 50)
+    messageGui.StudsOffset = Vector3.new(0, 3, 0)
+    messageGui.Parent = guards[1]
+
+    local messageText = Instance.new("TextLabel")
+    messageText.Size = UDim2.new(1, 0, 1, 0)
+    messageText.BackgroundTransparency = 1
+    messageText.Text = message
+    messageText.TextColor3 = Color3.new(1, 1, 1)
+    messageText.TextSize = 18
+    messageText.Font = Enum.Font.SourceSansBold
+    messageText.Parent = messageGui
+
+    wait(3)
+
+    messageGui:Destroy()
+end
+
+local function tryToLeave()
+    local leaveAttempts = 0
+    local lastAttemptTime = 0
+
+    return function()
+        local currentTime = tick()
+
+        if villageComplete then
+            stepAside()
+            return true
+        elseif currentTime - lastAttemptTime <= 10 then
+            leaveAttempts = leaveAttempts + 1
+            lastAttemptTime = currentTime
+
+            if leaveAttempts >= 10 then
+                showMessage("Fine. Here's a hint: Complete all village tasks, and you can leave.")
+            elseif leaveAttempts >= 5 then
+                showMessage("Stop trying. We said you cannot leave yet!")
+            else
+                showMessage("You can't leave the village yet.")
+            end
+        else
+            leaveAttempts = 1
+            lastAttemptTime = currentTime
+            showMessage("You can't leave the village yet.")
+        end
+
+        formLineFormation()
+        return false
+    end
+end
+
+local leaveCheck = tryToLeave()
+
+-- Connect player attempting to leave
+player.CharacterAdded:Connect(function(character)
+    character.Humanoid.Touched:Connect(function(part)
+        if part.Name == "Exit" then
+            leaveCheck()
+        end
+    end)
+end)
