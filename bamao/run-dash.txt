@@ -1,0 +1,81 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local camera = workspace.CurrentCamera
+
+local runSpeedMultiplier = 2
+local dashSpeedMultiplier = 5
+local dashCooldown = 15
+
+local isRunning = false
+local isDashing = false
+local canDash = true
+
+local runButton = Enum.KeyCode.LeftShift
+local dashButton = Enum.KeyCode.D
+local mobileRunButton = script.Parent:WaitForChild("RunButton")
+local mobileDashButton = script.Parent:WaitForChild("DashButton")
+
+local function updateMovement()
+    local moveDirection = (camera.CFrame.LookVector * Vector3.new(1, 0, 1)).unit
+    local moveSpeed = humanoid.WalkSpeed
+    
+    if isRunning then
+        moveSpeed = moveSpeed * runSpeedMultiplier
+    end
+
+    if isDashing then
+        moveSpeed = moveSpeed * dashSpeedMultiplier
+    end
+    
+    humanoid.WalkSpeed = moveSpeed
+    humanoid:Move(moveDirection * moveSpeed * (isRunning and 1.5 or 1) * (isDashing and 1.5 or 1))
+end
+
+local function onKeyPress(input)
+    if input.KeyCode == runButton and input.UserInputState == Enum.UserInputState.Begin then
+        isRunning = true
+        updateMovement()
+    elseif input.KeyCode == runButton and input.UserInputState == Enum.UserInputState.End then
+        isRunning = false
+        updateMovement()
+    elseif input.KeyCode == dashButton and input.UserInputState == Enum.UserInputState.Begin then
+        if canDash then
+            isDashing = true
+            canDash = false
+            updateMovement()
+            wait(0.1)  -- Adjust this delay to control the dash duration
+            isDashing = false
+            updateMovement()
+            wait(dashCooldown)
+            canDash = true
+        end
+    end
+end
+
+local function onMobileButtonPress(button)
+    if button == mobileRunButton.Name then
+        isRunning = true
+        updateMovement()
+    elseif button == mobileDashButton.Name then
+        if canDash then
+            isDashing = true
+            canDash = false
+            updateMovement()
+            wait(0.1)  -- Adjust this delay to control the dash duration
+            isDashing = false
+            updateMovement()
+            wait(dashCooldown)
+            canDash = true
+        end
+    end
+end
+
+game:GetService("UserInputService").InputBegan:Connect(onKeyPress)
+game:GetService("UserInputService").InputEnded:Connect(onKeyPress)
+mobileRunButton.Activated:Connect(function()
+    onMobileButtonPress(mobileRunButton.Name)
+end)
+mobileDashButton.Activated:Connect(function()
+    onMobileButtonPress(mobileDashButton.Name)
+end)
