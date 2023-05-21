@@ -1,0 +1,28 @@
+local npc = script.Parent
+local spawnPosition = npc.Position
+local animationId = "PLACEHOLDER_ANIMATION_ID"
+
+local function followPlayer()
+    local player = game.Players.LocalPlayer
+    local humanoid = npc:WaitForChild("Humanoid")
+    local animator = humanoid:WaitForChild("Animator")
+
+    while true do
+        local playerCharacter = player.Character
+        local playerHumanoidRootPart = playerCharacter and playerCharacter:FindFirstChild("HumanoidRootPart")
+
+        if playerHumanoidRootPart then
+            local distance = (playerHumanoidRootPart.Position - npc.Position).Magnitude
+            if distance > 10 then
+                animator:ApplyAnimation(Instance.new("Animation", animator), animationId)
+                humanoid:MoveTo(spawnPosition)
+            else
+                humanoid:MoveTo(playerHumanoidRootPart.Position)
+            end
+        end
+
+        wait()
+    end
+end
+
+followPlayer()
