@@ -1,0 +1,137 @@
+local dDoor = script.Parent
+local dDoorUI = dDoor:WaitForChild("UI")
+local dOpenButton = dDoorUI:WaitForChild("OpenButton")
+local dCloseButton = dDoorUI:WaitForChild("CloseButton")
+local dHoldButton = dDoorUI:WaitForChild("HoldButton")
+local dCancelButton = dDoorUI:WaitForChild("CancelButton")
+
+local dPasswordAttempts = 0
+local dMaxPasswordAttempts = 3
+local dPasswordHint = "Village Leader"
+local dIsOpen = false
+local dIsHeldOpen = false
+local dCollapseEnabled = false
+
+local dDoorStartPosition = dDoor.Position
+local dDoorOpenPosition = Vector3.new(dDoorStartPosition.X - 10, dDoorStartPosition.Y, dDoorStartPosition.Z)
+local dDoorClosedPosition = dDoorStartPosition
+local dSlideDuration = 1
+
+local function dSlideDoorTo(position)
+	local startPosition = dDoor.Position
+	local t = 0
+
+	while t < 1 do
+		t = t + (1 / dSlideDuration) * wait()
+		dDoor.Position = startPosition:Lerp(position, t)
+	end
+
+	dDoor.Position = position
+end
+
+local function dOpenDoor()
+	if not dIsOpen then
+		dIsOpen = true
+		dSlideDoorTo(dDoorOpenPosition)
+
+		wait(5)
+
+		if dIsOpen and not dIsHeldOpen then
+			dCloseDoor()
+		end
+	end
+end
+
+local function dCloseDoor()
+	if dIsOpen then
+		dIsOpen = false
+		dSlideDoorTo(dDoorClosedPosition)
+	end
+end
+
+local function dHoldDoor()
+	if dIsOpen then
+		dIsHeldOpen = true
+	end
+end
+
+local function dCancelInteraction()
+	dDoorUI.Visible = false
+end
+
+local function dProcessPassword(password)
+	if password == "COLLAPSE" then
+		dCollapseEnabled = true
+		-- Perform collapse logic
+		-- ...
+		return true
+	elseif password == "UNCOLLAPSE" then
+		dCollapseEnabled = false
+		-- Perform uncollapse logic
+		-- ...
+		return true
+	elseif password == "Monte" and not dIsOpen then
+		dOpenDoor()
+		return true
+	end
+	return false
+end
+
+local function dDisplayPasswordHint()
+	if not dPasswordHintLabel.Visible then
+		dPasswordAttempts = 0
+	end
+	dPasswordHintLabel.Text = dPasswordHint
+	dPasswordHintLabel.Visible = true
+end
+
+local function dHidePasswordHint()
+	dPasswordHintLabel.Visible = false
+end
+
+local function dButtonPressed(button)
+	if button.Name == "CancelButton" then
+		dCancelInteraction()
+	elseif button.Name == "OpenButton" then
+		dOpenDoor()
+	elseif button.Name == "CloseButton" then
+		dCloseDoor()
+	elseif button.Name == "HoldButton" then
+		dHoldDoor()
+	end
+end
+
+local function dInputBegan(input)
+	if input.UserInputType == Enum.UserInputType.Keyboard then
+		local password = input.KeyCode.Name
+		if dProcessPassword(password) then
+			dDoorUI.Visible = false
+			dHidePasswordHint()
+		else
+			dPasswordAttempts = dPasswordAttempts + 1
+			if dPasswordAttempts >= dMaxPasswordAttempts then
+				dDisplayPasswordHint()
+			end
+		end
+	end
+end
+
+dOpenButton.MouseButton1Click:Connect(function()
+	dButtonPressed(dOpenButton)
+end)
+
+dCloseButton.MouseButton1Click:Connect(function()
+	dButtonPressed(dCloseButton)
+end)
+
+dHoldButton.MouseButton1Click:Connect(function()
+	dButtonPressed(dHoldButton)
+end)
+
+dCancelButton.MouseButton1Click:Connect(function()
+	dButtonPressed(dCancelButton)
+end)
+
+game:GetService("UserInputService").InputBegan:Connect(dInputBegan)
+
+dDoor.MouseButton1Click:Connect(dHandleInteraction)
