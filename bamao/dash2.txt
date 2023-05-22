@@ -1,0 +1,86 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local camera = workspace.CurrentCamera
+
+local runSpeedMultiplier = 2
+local dashSpeedMultiplier = 5
+local dashCooldown = 15
+
+local isRunning = false
+local isDashing = false
+local canDash = true
+
+local runButton = Enum.KeyCode.LeftShift
+local dashButton = Enum.KeyCode.Q
+local mobileRunButton = script.Parent:WaitForChild("RunButton")
+local mobileDashButton = script.Parent:WaitForChild("DashButton", 3)
+
+local moveDirection = (camera.CFrame.LookVector * Vector3.new(1, 0, 1)).unit
+local moveSpeed = humanoid.WalkSpeed
+
+local function updateMovement()
+    if humanoid and humanoid:IsDescendantOf(character) then
+        if isRunning then
+            moveSpeed = humanoid.WalkSpeed * runSpeedMultiplier
+        elseif isDashing then
+            moveSpeed = humanoid.WalkSpeed * dashSpeedMultiplier
+        else
+            moveSpeed = humanoid.WalkSpeed
+        end
+
+        humanoid.WalkSpeed = moveSpeed
+        humanoid:Move(moveDirection * moveSpeed * (isRunning and 1.5 or 1) * (isDashing and 1.5 or 1))
+    end
+end
+
+local function onKeyPress(input)
+    if input.KeyCode == runButton and input.UserInputState == Enum.UserInputState.Begin then
+        isRunning = true
+    elseif input.KeyCode == runButton and input.UserInputState == Enum.UserInputState.End then
+        isRunning = false
+    elseif input.KeyCode == dashButton and input.UserInputState == Enum.UserInputState.Begin then
+        if canDash then
+            isDashing = true
+            canDash = false
+            updateMovement()
+            wait(0.1)
+            isDashing = false
+            updateMovement()
+            humanoid.WalkSpeed = humanoid.WalkSpeed
+            wait(dashCooldown)
+            canDash = true
+        end
+    end
+end
+
+local function onMobileButtonPress(button)
+    if button == mobileRunButton.Name then
+        isRunning = true
+    elseif button == "DashButton" then
+        if canDash then
+            isDashing = true
+            canDash = false
+            updateMovement()
+            wait(0.1)
+            isDashing = false
+            updateMovement()
+            humanoid.WalkSpeed = humanoid.WalkSpeed
+            wait(dashCooldown)
+            canDash = true
+        end
+    end
+end
+
+game:GetService("UserInputService").InputBegan:Connect(onKeyPress)
+game:GetService("UserInputService").InputEnded:Connect(onKeyPress)
+mobileRunButton.Activated:Connect(function()
+    onMobileButtonPress(mobileRunButton.Name)
+end)
+if mobileDashButton then
+    mobileDashButton.Activated:Connect(function()
+        onMobileButtonPress("DashButton")
+    end)
+end
+
+game:GetService("RunService").Stepped:Connect(updateMovement)
