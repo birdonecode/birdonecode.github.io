@@ -1,0 +1,60 @@
+Version 0.1.0:
+- Added walking animations
+- Add door interaction
+- Add furnitures to the Monte Building in Babaowoods
+- Remove lag
+- Refurbish game
+- Recover game files
+- Remove most textures to fight against game lag
+
+Version 0.2.0:
+- Reduce in-game lag
+- Degrade texture to plastic to reduce lag
+- Change hut texture in Babaowoods
+- Add new game thumbnail
+
+Version 0.2.1:
+- Performance Optimization
+- Bug Fixes
+- Refinement of House Models
+
+Version 0.2.2:
+- Fix lags (Down to 75% or less)
+
+Version 0.2.3:
+- Removal of Testing Assets
+- Bug Fixes
+
+Version 0.2.4:
+- Improved camera system
+- UI improvements
+
+Version 0.2.5:
+- New item designs
+- Quality of Life improvements
+
+Version 0.3.0:
+- Quality of Life Enhancements
+- Refined House Models
+
+Version 0.3.1:
+- Less lag/freezing rate (down to 50% or less)
+
+Version 0.4.0:
+- Performance Optimization
+- Minor UI Improvements
+- Minor Content Additions
+
+Version 0.4.1:
+- Quality of Life Enhancements
+- Bug Fixes
+
+Version 0.4.2:
+- UI improvements
+
+Version 0.5.0:
+- Gameplay Balancing
+- New item designs
+
+Version 0.5.1:
+- Less lag/freezing rate (down to 20% or less)
