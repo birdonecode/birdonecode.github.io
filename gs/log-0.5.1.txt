@@ -1,0 +1,43 @@
+Version 0.2.1:
+- Performance Optimization
+- Bug Fixes
+- Refinement of House Models
+
+Version 0.2.2:
+- Removal of Testing Assets
+- Bug Fixes
+
+Version 0.2.3:
+- Improved camera system
+- UI improvements
+
+Version 0.2.4:
+- New item designs
+- Quality of Life improvements
+
+Version 0.3.0:
+- Quality of Life Enhancements
+- Refined House Models
+
+Version 0.3.1:
+- Less lag/freezing rate (down to 50% or less)
+
+Version 0.4.0:
+- Performance Optimization
+- Minor UI Improvements
+- Minor Content Additions
+
+Version 0.4.1:
+- Quality of Life Enhancements
+- Bug Fixes
+
+Version 0.4.2:
+- UI improvements
+- New item designs
+
+Version 0.5.0:
+- Minor Content Additions
+- Gameplay Balancing
+
+Version 0.5.1:
+- Less lag/freezing rate (down to 20% or less)
