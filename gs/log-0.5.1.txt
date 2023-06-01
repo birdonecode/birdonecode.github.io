@@ -33,11 +33,10 @@ Version 0.4.1:
 
 Version 0.4.2:
 - UI improvements
-- New item designs
 
 Version 0.5.0:
-- Minor Content Additions
 - Gameplay Balancing
+- New item designs
 
 Version 0.5.1:
 - Less lag/freezing rate (down to 20% or less)
